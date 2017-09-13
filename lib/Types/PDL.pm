@@ -153,7 +153,7 @@ empty.
 =item  C<null>
 
 This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
-empty.
+null.
 
 =item  C<ndims>
 
