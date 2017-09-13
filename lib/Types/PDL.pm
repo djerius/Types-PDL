@@ -23,6 +23,13 @@ facet 'empty', sub {
       { var => $var, not => ( !!delete( $o->{empty} ) ? '' : '!' ) };
 };
 
+facet 'null', sub {
+    my ( $o, $var ) = @_;
+    return unless exists $o->{null};
+    errf '%{not}s%{var}s->isnull',
+      { var => $var, not => ( !!delete( $o->{null} ) ? '' : '!' ) };
+};
+
 facet ndims => sub {
     my ( $o, $var ) = @_;
 
@@ -90,7 +97,7 @@ facet ndims => sub {
 };
 
 
-facetize qw[ empty ndims ], class_type Piddle, { class => 'PDL' };
+facetize qw[ empty null ndims ], class_type Piddle, { class => 'PDL' };
 
 1;
 
@@ -129,7 +136,7 @@ C<Piddle> accepts the following parameters (L</Parameters>):
 =head2 Parameters
 
 Some types take optional parameters which add additional constraints on
-the object.  For example, to indicate that only empty piddles are excepted:
+the object.  For example, to indicate that only empty piddles are accepted:
 
   validate( [pdl], Piddle[ empty => 1 ] );
 
@@ -139,7 +146,14 @@ The available parameters are:
 
 =item  C<empty>
 
-This accepts a boolean value; if true the piddle must be empty, if false, it must not be empty.
+This accepts a boolean value; if true the piddle must be empty
+(i.e. the C<isempty> method returns true), if false, it must not be
+empty.
+
+=item  C<null>
+
+This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
+empty.
 
 =item  C<ndims>
 

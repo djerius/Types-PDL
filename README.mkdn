@@ -36,7 +36,7 @@ Allows an object blessed into the class `PDL`, e.g.
 ## Parameters
 
 Some types take optional parameters which add additional constraints on
-the object.  For example, to indicate that only empty piddles are excepted:
+the object.  For example, to indicate that only empty piddles are accepted:
 
     validate( [pdl], Piddle[ empty => 1 ] );
 
@@ -44,7 +44,14 @@ The available parameters are:
 
 - `empty`
 
-    This accepts a boolean value; if true the piddle must be empty, if false, it must not be empty.
+    This accepts a boolean value; if true the piddle must be empty
+    (i.e. the `isempty` method returns true), if false, it must not be
+    empty.
+
+- `null`
+
+    This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
+    empty.
 
 - `ndims`
 
