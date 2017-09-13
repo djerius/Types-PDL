@@ -1,0 +1,77 @@
+# NAME
+
+Types::PDL - PDL types using Type::Tiny
+
+# VERSION
+
+version 0.01
+
+# SYNOPSIS
+
+    use Types::PDL -types;
+    use Type::Params qw[ validate ];
+    use PDL;
+
+    validate( [ pdl ], Piddle );
+
+# DESCRIPTION
+
+This module provides [Type::Tiny](https://metacpan.org/pod/Type::Tiny) compatible types for [PDL](https://metacpan.org/pod/PDL).
+
+## Types
+
+### `Piddle`
+
+Allows an object blessed into the class `PDL`, e.g.
+
+    validate( [pdl], Piddle );
+
+`Piddle` accepts the following parameters (["Parameters"](#parameters)):
+
+    empty
+    ndims
+    ndims_min
+    ndims_max
+
+## Parameters
+
+Some types take optional parameters which add additional constraints on
+the object.  For example, to indicate that only empty piddles are excepted:
+
+    validate( [pdl], Piddle[ empty => 1 ] );
+
+The available parameters are:
+
+- `empty`
+
+    This accepts a boolean value; if true the piddle must be empty, if false, it must not be empty.
+
+- `ndims`
+
+    This specifies a fixed number of dimensions which the piddle must have. Don't mix use this
+    with `ndims_min` or `ndims_max`.
+
+- `ndims_min`
+
+    The minimum number of dimensions the piddle may have. Don't specify this with `ndims`.
+
+- `ndims_max`
+
+    The maximum number of dimensions the piddle may have. Don't specify this with `ndims`.
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://rt.cpan.org/Public/Dist/Display.html?Name=Types-PDL](https://rt.cpan.org/Public/Dist/Display.html?Name=Types-PDL).
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007
