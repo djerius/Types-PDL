@@ -120,15 +120,15 @@ facet ndims => sub {
 
 facetize qw[ empty null ndims ], class_type Piddle, { class => 'PDL' };
 
-facetize qw[ empty ],
+facetize qw[ empty null ],
   declare Piddle1D,
   as Piddle[ ndims => 1];
 
-facetize qw[ empty ],
+facetize qw[ empty null ],
   declare Piddle2D,
   as Piddle[ ndims => 2];
 
-facetize qw[ empty ],
+facetize qw[ empty null ],
   declare Piddle3D,
   as Piddle[ ndims => 3];
 
@@ -174,6 +174,7 @@ It accepts the following parameters:
 Allows an object blessed into the class C<PDL> with C<ndims> = 1.
 It accepts the following parameters:
 
+  null
   empty
 
 =head3 C<Piddle2D>
@@ -181,6 +182,7 @@ It accepts the following parameters:
 Allows an object blessed into the class C<PDL> with C<ndims> = 2.
 It accepts the following parameters:
 
+  null
   empty
 
 =head3 C<Piddle3D>
@@ -188,6 +190,7 @@ It accepts the following parameters:
 Allows an object blessed into the class C<PDL> with C<ndims> = 3.
 It accepts the following parameters:
 
+  null
   empty
 
 =head2 Coercions
