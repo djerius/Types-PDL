@@ -163,6 +163,7 @@ Allows an object blessed into the class C<PDL>, e.g.
 
 It accepts the following parameters:
 
+  null
   empty
   ndims
   ndims_min
