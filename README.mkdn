@@ -20,18 +20,54 @@ This module provides [Type::Tiny](https://metacpan.org/pod/Type::Tiny) compatibl
 
 ## Types
 
+Types which accept parameters (see ["Parameters"](#parameters)) will list them.
+
 ### `Piddle`
 
 Allows an object blessed into the class `PDL`, e.g.
 
     validate( [pdl], Piddle );
 
-`Piddle` accepts the following parameters (["Parameters"](#parameters)):
+It accepts the following parameters:
 
+    null
     empty
     ndims
     ndims_min
     ndims_max
+
+### `Piddle1D`
+
+Allows an object blessed into the class `PDL` with `ndims` = 1.
+It accepts the following parameters:
+
+    empty
+
+### `Piddle2D`
+
+Allows an object blessed into the class `PDL` with `ndims` = 2.
+It accepts the following parameters:
+
+    empty
+
+### `Piddle3D`
+
+Allows an object blessed into the class `PDL` with `ndims` = 3.
+It accepts the following parameters:
+
+    empty
+
+## Coercions
+
+The following coercions are provided, and may be applied via a type object's
+["plus\_coercions" in Type::Tiny](https://metacpan.org/pod/Type::Tiny#plus_coercions) or ["plus\_fallback\_coercions" in Type::Tiny](https://metacpan.org/pod/Type::Tiny#plus_fallback_coercions) methods,
+e.g.
+
+    Piddle->plus_coercions( PiddleFromAny );
+
+### `PiddleFromAny`
+
+Uses ["topdl" in PDL::Core](https://metacpan.org/pod/PDL::Core#topdl) to coerce the value into a piddle.
 
 ## Parameters
 
@@ -42,29 +78,29 @@ the object.  For example, to indicate that only empty piddles are accepted:
 
 The available parameters are:
 
-- `empty`
+### `empty`
 
-    This accepts a boolean value; if true the piddle must be empty
-    (i.e. the `isempty` method returns true), if false, it must not be
-    empty.
+This accepts a boolean value; if true the piddle must be empty
+(i.e. the `isempty` method returns true), if false, it must not be
+empty.
 
-- `null`
+### `null`
 
-    This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
-    null.
+This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
+null.
 
-- `ndims`
+### `ndims`
 
-    This specifies a fixed number of dimensions which the piddle must have. Don't mix use this
-    with `ndims_min` or `ndims_max`.
+This specifies a fixed number of dimensions which the piddle must have. Don't mix use this
+with `ndims_min` or `ndims_max`.
 
-- `ndims_min`
+### `ndims_min`
 
-    The minimum number of dimensions the piddle may have. Don't specify this with `ndims`.
+The minimum number of dimensions the piddle may have. Don't specify this with `ndims`.
 
-- `ndims_max`
+### `ndims_max`
 
-    The maximum number of dimensions the piddle may have. Don't specify this with `ndims`.
+The maximum number of dimensions the piddle may have. Don't specify this with `ndims`.
 
 # BUGS AND LIMITATIONS
 
