@@ -142,34 +142,30 @@ the object.  For example, to indicate that only empty piddles are accepted:
 
 The available parameters are:
 
-=over
-
-=item  C<empty>
+=head3  C<empty>
 
 This accepts a boolean value; if true the piddle must be empty
 (i.e. the C<isempty> method returns true), if false, it must not be
 empty.
 
-=item  C<null>
+=head3  C<null>
 
 This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
 null.
 
-=item  C<ndims>
+=head3 C<ndims>
 
 This specifies a fixed number of dimensions which the piddle must have. Don't mix use this
 with C<ndims_min> or C<ndims_max>.
 
-=item  C<ndims_min>
+=head3 C<ndims_min>
 
 The minimum number of dimensions the piddle may have. Don't specify this with C<ndims>.
 
 
-=item  C<ndims_max>
+=head3  C<ndims_max>
 
 The maximum number of dimensions the piddle may have. Don't specify this with C<ndims>.
-
-=back
 
 
 =head1 SEE ALSO
