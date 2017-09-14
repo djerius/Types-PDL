@@ -27,16 +27,6 @@ use String::Errf 'errf';
 use B qw(perlstring);
 
 
-declare_coercion PiddleFromAny,
-  from Any,
-  q[ do { local $@;
-          require PDL::Core;
-          my $new = eval { PDL::Core::topdl( $_ )  };
-          $@ ? $_ : $new
-     }
-  ];
-
-
 facet 'empty', sub {
     my ( $o, $var ) = @_;
     return unless exists $o->{empty};
@@ -131,6 +121,17 @@ facetize qw[ empty null ],
 facetize qw[ empty null ],
   declare Piddle3D,
   as Piddle[ ndims => 3];
+
+declare_coercion PiddleFromAny,
+  to_type Piddle,
+  from Any,
+  q[ do { local $@;
+          require PDL::Core;
+          my $new = eval { PDL::Core::topdl( $_ )  };
+          $@ ? $_ : $new
+     }
+  ];
+
 
 1;
 
