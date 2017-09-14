@@ -9,12 +9,33 @@ our $VERSION = '0.01';
 
 use Carp;
 
-use Type::Library -base, -declare => qw[ Piddle  ];
-use Types::Standard 'is_Int';
+use Type::Library -base,
+  -declare => qw[
+    Piddle
+    Piddle1D
+    Piddle2D
+    Piddle3D
+
+    PiddleFromAny
+  ];
+
+
+use Types::Standard -types, 'is_Int';
 use Type::Utils;
 use Type::TinyX::Facets;
 use String::Errf 'errf';
 use B qw(perlstring);
+
+
+declare_coercion PiddleFromAny,
+  from Any,
+  q[ do { local $@;
+          require PDL::Core;
+          my $new = eval { PDL::Core::topdl( $_ )  };
+          $@ ? $_ : $new
+     }
+  ];
+
 
 facet 'empty', sub {
     my ( $o, $var ) = @_;
@@ -99,6 +120,18 @@ facet ndims => sub {
 
 facetize qw[ empty null ndims ], class_type Piddle, { class => 'PDL' };
 
+facetize qw[ empty ],
+  declare Piddle1D,
+  as Piddle[ ndims => 1];
+
+facetize qw[ empty ],
+  declare Piddle2D,
+  as Piddle[ ndims => 2];
+
+facetize qw[ empty ],
+  declare Piddle3D,
+  as Piddle[ ndims => 3];
+
 1;
 
 # COPYRIGHT
@@ -120,18 +153,54 @@ This module provides L<Type::Tiny> compatible types for L<PDL>.
 
 =head2 Types
 
+Types which accept parameters (see L</Parameters>) will list them.
+
 =head3 C<Piddle>
 
 Allows an object blessed into the class C<PDL>, e.g.
 
   validate( [pdl], Piddle );
 
-C<Piddle> accepts the following parameters (L</Parameters>):
+It accepts the following parameters:
 
   empty
   ndims
   ndims_min
   ndims_max
+
+=head3 C<Piddle1D>
+
+Allows an object blessed into the class C<PDL> with C<ndims> = 1.
+It accepts the following parameters:
+
+  empty
+
+=head3 C<Piddle2D>
+
+Allows an object blessed into the class C<PDL> with C<ndims> = 2.
+It accepts the following parameters:
+
+  empty
+
+=head3 C<Piddle3D>
+
+Allows an object blessed into the class C<PDL> with C<ndims> = 3.
+It accepts the following parameters:
+
+  empty
+
+=head2 Coercions
+
+The following coercions are provided, and may be applied via a type object's
+L<Type::Tiny/plus_coercions> or L<Type::Tiny/plus_fallback_coercions> methods,
+e.g.
+
+  Piddle->plus_coercions( PiddleFromAny );
+
+=head3 C<PiddleFromAny>
+
+Uses L<PDL::Core/topdl> to coerce the value into a piddle.
+
 
 =head2 Parameters
 
