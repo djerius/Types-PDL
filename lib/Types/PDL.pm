@@ -12,6 +12,7 @@ use Carp;
 use Type::Library -base,
   -declare => qw[
     Piddle
+    Piddle0D
     Piddle1D
     Piddle2D
     Piddle3D
@@ -110,6 +111,10 @@ facet ndims => sub {
 
 facetize qw[ empty null ndims ], class_type Piddle, { class => 'PDL' };
 
+facetize qw[ null ],
+  declare Piddle0D,
+  as Piddle[ ndims => 0];
+
 facetize qw[ empty null ],
   declare Piddle1D,
   as Piddle[ ndims => 1];
@@ -170,6 +175,13 @@ It accepts the following parameters:
   ndims_min
   ndims_max
 
+=head3 C<Piddle0D>
+
+Allows an object blessed into the class C<PDL> with C<ndims> = 0.
+It accepts the following parameters:
+
+  null
+
 =head3 C<Piddle1D>
 
 Allows an object blessed into the class C<PDL> with C<ndims> = 1.
@@ -196,9 +208,9 @@ It accepts the following parameters:
 
 =head2 Coercions
 
-The following coercions are provided, and may be applied via a type object's
-L<Type::Tiny/plus_coercions> or L<Type::Tiny/plus_fallback_coercions> methods,
-e.g.
+The following coercions are provided, and may be applied via a type
+object's L<Type::Tiny/plus_coercions> or
+L<Type::Tiny/plus_fallback_coercions> methods, e.g.
 
   Piddle->plus_coercions( PiddleFromAny );
 
@@ -209,8 +221,9 @@ Uses L<PDL::Core/topdl> to coerce the value into a piddle.
 
 =head2 Parameters
 
-Some types take optional parameters which add additional constraints on
-the object.  For example, to indicate that only empty piddles are accepted:
+Some types take optional parameters which add additional constraints
+on the object.  For example, to indicate that only empty piddles are
+accepted:
 
   validate( [pdl], Piddle[ empty => 1 ] );
 
@@ -224,22 +237,24 @@ empty.
 
 =head3  C<null>
 
-This accepts a boolean value; if true the piddle must be a null piddle, if false, it must not be
-null.
+This accepts a boolean value; if true the piddle must be a null
+piddle, if false, it must not be null.
 
 =head3 C<ndims>
 
-This specifies a fixed number of dimensions which the piddle must have. Don't mix use this
-with C<ndims_min> or C<ndims_max>.
+This specifies a fixed number of dimensions which the piddle must
+have. Don't mix use this with C<ndims_min> or C<ndims_max>.
 
 =head3 C<ndims_min>
 
-The minimum number of dimensions the piddle may have. Don't specify this with C<ndims>.
+The minimum number of dimensions the piddle may have. Don't specify
+this with C<ndims>.
 
 
 =head3  C<ndims_max>
 
-The maximum number of dimensions the piddle may have. Don't specify this with C<ndims>.
+The maximum number of dimensions the piddle may have. Don't specify
+this with C<ndims>.
 
 
 =head1 SEE ALSO
