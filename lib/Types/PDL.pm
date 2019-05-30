@@ -128,7 +128,7 @@ facet 'shape', sub {
 
     my $shape = delete $o->{shape};
 
-    croak( "shape must be a string or an arrayref of specifications" ) 
+    croak( "shape must be a string or an arrayref of specifications" )
       unless 'ARRAY' eq ref $shape or ! ref $shape;
 
     errf q|join( ',', %{var}s->dims) =~ qr/%{regexp}s/x|,
@@ -423,4 +423,3 @@ list of types, run this command:
 
 
 =head1 SEE ALSO
-
