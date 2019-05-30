@@ -122,13 +122,13 @@ facet 'type', sub {
 
 facetize qw[ empty null ndims type ], class_type Piddle, { class => 'PDL' };
 
-facetize qw[ null ], declare Piddle0D, as Piddle [ ndims => 0 ];
+facetize qw[ null type ], declare Piddle0D, as Piddle [ ndims => 0 ];
 
-facetize qw[ empty null ], declare Piddle1D, as Piddle [ ndims => 1 ];
+facetize qw[ empty null type ], declare Piddle1D, as Piddle [ ndims => 1 ];
 
-facetize qw[ empty null ], declare Piddle2D, as Piddle [ ndims => 2 ];
+facetize qw[ empty null type ], declare Piddle2D, as Piddle [ ndims => 2 ];
 
-facetize qw[ empty null ], declare Piddle3D, as Piddle [ ndims => 3 ];
+facetize qw[ empty null type ], declare Piddle3D, as Piddle [ ndims => 3 ];
 
 declare_coercion PiddleFromAny, to_type Piddle, from Any, q[ do { local $@;
           require PDL::Core;
