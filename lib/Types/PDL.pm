@@ -2,6 +2,8 @@ package Types::PDL;
 
 # ABSTRACT: PDL types using Type::Tiny
 
+use 5.010;
+
 use strict;
 use warnings;
 
@@ -120,15 +122,29 @@ facet 'type', sub {
       { var => $var, type => $type };
 };
 
-facetize qw[ empty null ndims type ], class_type Piddle, { class => 'PDL' };
+facet 'shape', sub {
+    my ( $o, $var ) = @_;
+    return unless exists $o->{shape};
+
+    my $shape = delete $o->{shape};
+
+    croak( "shape must be a string or an arrayref of specifications" ) 
+      unless 'ARRAY' eq ref $shape or ! ref $shape;
+
+    errf q|join( ',', %{var}s->dims) =~ qr/%{regexp}s/x|,
+      { var => $var, regexp => _mk_shape_regexp( $shape ) };
+};
+
+
+facetize qw[ empty null ndims type shape ], class_type Piddle, { class => 'PDL' };
 
 facetize qw[ null type ], declare Piddle0D, as Piddle [ ndims => 0 ];
 
-facetize qw[ empty null type ], declare Piddle1D, as Piddle [ ndims => 1 ];
+facetize qw[ empty null type shape ], declare Piddle1D, as Piddle [ ndims => 1 ];
 
-facetize qw[ empty null type ], declare Piddle2D, as Piddle [ ndims => 2 ];
+facetize qw[ empty null type shape ], declare Piddle2D, as Piddle [ ndims => 2 ];
 
-facetize qw[ empty null type ], declare Piddle3D, as Piddle [ ndims => 3 ];
+facetize qw[ empty null type shape ], declare Piddle3D, as Piddle [ ndims => 3 ];
 
 declare_coercion PiddleFromAny, to_type Piddle, from Any, q[ do { local $@;
           require PDL::Core;
@@ -136,6 +152,88 @@ declare_coercion PiddleFromAny, to_type Piddle, from Any, q[ do { local $@;
           $@ ? $_ : $new
      }
   ];
+
+
+sub _mk_shape_regexp {
+
+    my $spec = shift;
+
+    # positive integer
+    my $int = q/(?:[0123456789]+)/;
+
+    my $re = qr/
+               \s*(?:
+                   (?:
+                       (?<int> $int )
+                       |
+                       (?<any> X | : ) )
+                   (?:
+                        (?<quant>[*+?])
+                    | (?:\{
+                                (?<min>$int)
+                                (?:(?<comma>,) (?<max>$int)? )?
+                         \}
+                        )
+                   )?
+               )
+               \s*
+               /x;
+
+    my @spec;
+
+    if ( !ref $spec ) {
+        push @spec, { %+ }  while $spec =~ /\G$re,?/gc;
+        croak( "error in spec starting HERE ==>",
+            substr( $spec, pos( $spec ) || 0 ), "<\n" )
+          if ( pos( $spec ) || 0 ) != length( $spec );
+    }
+    else {
+
+        @spec = map {
+            croak( "error parsing spec: >$_<\n" )
+              unless /^$re$/;
+            +{ %+ }
+        } @$spec;
+    }
+
+
+    my @shape;
+
+    for my $spec ( @spec ) {
+
+        my $extent;
+
+        if ( defined $spec->{int} ) {
+            $extent = $spec->{int};
+            croak( "extent cannot be zero"  )
+              if ( $extent += 0 ) == 0;
+        }
+        else {
+            $extent = $int;
+        }
+
+        my $res = "(?:${extent},?)";
+
+
+        if ( defined $spec->{quant} ) {
+            $res .= $spec->{quant};
+        }
+        elsif ( defined $spec->{min} ) {
+
+                $res .= '{' . $spec->{min};
+
+                $res .= ',' if defined $spec->{comma};
+                $res .= $spec->{max} if defined $spec->{max};
+                $res .= '}';
+            }
+
+        push @shape, $res;
+    }
+
+    #  this must be a string!
+    return '^' . join( '', @shape ) . '$';
+}
+
 
 
 1;
@@ -174,6 +272,7 @@ It accepts the following parameters:
   ndims
   ndims_min
   ndims_max
+  shape
   type
 
 =head3 C<Piddle0D>
@@ -191,6 +290,7 @@ It accepts the following parameters:
 
   null
   empty
+  shape
   type
 
 =head3 C<Piddle2D>
@@ -200,6 +300,7 @@ It accepts the following parameters:
 
   null
   empty
+  shape
   type
 
 =head3 C<Piddle3D>
@@ -209,6 +310,7 @@ It accepts the following parameters:
 
   null
   empty
+  shape
   type
 
 =head2 Coercions
@@ -260,6 +362,55 @@ this with C<ndims>.
 
 The maximum number of dimensions the piddle may have. Don't specify
 this with C<ndims>.
+
+=head3 C<shape>
+
+The shape of the piddle.
+
+The value is a list of specifications for dimensions, expressed either
+as elements in a Perl array or as comma-delimited fields in a string.
+
+The specifications are reminiscent of regular expressions.  A specification
+is composed of an extent size followed by an optional quantifier indicating
+the number of dimensions it should match.
+
+Extent sizes may be
+
+=over
+
+=item 1
+
+A non-zero positive integer representing the extent of the dimension.
+
+=item 2
+
+The strings C<X> or C<:> indicating that any extent is accepted for that dimension
+
+=back
+
+Quantifiers may be
+
+  *           Match 0 or more times
+  +           Match 1 or more times
+  ?           Match 1 or 0 times
+  {n}         Match exactly n times
+  {n,}        Match at least n times
+  {n,m}       Match at least n but not more than m times
+
+
+Here are some example specifications and the shapes they might match  (in the match, C<X> means any extent):
+
+  2,2     => (2,2)
+  3,3,3   => (3,3,3)
+  3{3}    => (3,3,3)
+  3{2,3}  => (3,3),  (3,3,3)
+  1,X     => (1,X)
+  1,X+    => (1,X), (1,X,X),  (1,X,X,X), ...
+  1,X{1,} => (1,X), (1,X,X),  (1,X,X,X), ...
+  1,X?,3   => (1,X,3), (1,3)
+  1,2,X*   => (1,2), (1,2,X),  (1,2,X,X), ...
+  1,2,3*,5   => (1,2,5), (1,2,3,5),  (1,2,3,3,5), ...
+
 
 =head3 C<type>
 
